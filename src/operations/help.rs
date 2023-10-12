@@ -38,5 +38,15 @@ impl Operation for Help {
         cli::print_subheader(2, "Available Commands");
         println!("* help        : view the help content");
         println!("* interactive : allows to define and run an experiment interactively");
+
+        cli::print_subheader(2, "Examples");
+        println!("{}", ">_ cargo run --release help".green());
+        println!("{}", "to view this content".italic());
+        println!();
+        println!("{}", ">_ cargo run --release interactive".green());
+        println!(
+            "{}",
+            "to define and run the experimentation interactively".italic()
+        );
     }
 }
