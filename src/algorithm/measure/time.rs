@@ -1,20 +1,20 @@
 use super::run_measure::Measure;
 use crate::{graph::sp_graph::SpGraph, Weight};
-use std::time::SystemTime;
+use std::time::Instant;
 
 pub struct Time {
-    pub start_time: SystemTime,
+    pub start_time: Instant,
     pub elapsed_seconds: f32,
 }
 impl Time {
     pub fn start() -> Self {
         Self {
-            start_time: SystemTime::now(),
+            start_time: Instant::now(),
             elapsed_seconds: f32::INFINITY,
         }
     }
     pub fn stop(&mut self) {
-        let elapsed = self.start_time.elapsed().unwrap();
+        let elapsed = self.start_time.elapsed();
         self.elapsed_seconds = elapsed.as_secs_f32();
     }
 }
