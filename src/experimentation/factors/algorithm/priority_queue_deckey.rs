@@ -1,10 +1,10 @@
+use super::dary::Dary;
 use crate::utils::cli;
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use super::dary::Dary;
-
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum PriorityQueueDecKey {
     OrxDaryHeapOfIndices(Dary),
     OrxDaryHeapWithMap(Dary),

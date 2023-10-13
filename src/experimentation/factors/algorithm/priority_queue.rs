@@ -1,10 +1,11 @@
 use super::dary::Dary;
 use crate::utils::cli;
 use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum PriorityQueue {
     OrxDaryHeap(Dary),
     StdBinaryHeap,

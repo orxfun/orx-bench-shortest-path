@@ -1,9 +1,10 @@
 use super::factor::Factor;
 use crate::utils::cli;
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-#[derive(Clone, Copy, Debug, EnumIter)]
+#[derive(Clone, Copy, Debug, EnumIter, Serialize, Deserialize)]
 pub enum FactorAlgorithmData {
     Cached,
     Pure,

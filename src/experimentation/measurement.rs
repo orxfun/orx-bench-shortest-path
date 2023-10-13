@@ -1,8 +1,9 @@
 use crate::utils::cli;
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-#[derive(Clone, Debug, EnumIter)]
+#[derive(Clone, Debug, EnumIter, Serialize, Deserialize)]
 pub enum Measurement {
     Time,
     Memory,

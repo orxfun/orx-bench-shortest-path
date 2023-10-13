@@ -1,8 +1,9 @@
 use crate::{graph::sp_graph::SpGraph, utils::cli, Weight};
 use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct GraphRandom {
     pub seed: u64,
     pub num_nodes: usize,

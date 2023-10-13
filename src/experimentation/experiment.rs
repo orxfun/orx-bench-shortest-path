@@ -17,8 +17,10 @@ use crate::{
     },
     utils::{self, cli},
 };
+use serde::{Deserialize, Serialize};
 use std::io::Write;
 
+#[derive(Serialize, Deserialize)]
 pub struct Experiment {
     pub measurement: Measurement,
     pub graph_data: Vec<FactorGraphData>,
@@ -88,14 +90,24 @@ impl Experiment {
         );
         self.run_core::<E, M>(&experiment_name, true);
     }
+    pub fn run_fromfile<E, M>(self, experiment_name: &str)
+    where
+        M: Measure,
+        E: TreatmentMeasure<M = M>,
+    {
+        self.run_core::<E, M>(experiment_name, false);
+    }
     fn run_core<E, M>(&self, experiment_name: &str, interactive: bool)
     where
         M: Measure,
         E: TreatmentMeasure<M = M>,
     {
-        let result_file = utils::fs::get_file_path(experiment_name);
-        let mut file =
-            std::fs::File::create(result_file.as_path()).expect("failed to open result file");
+        let (path_exp, path_res) =
+            utils::fs::get_experiment_and_results_paths(experiment_name, interactive);
+        utils::fs::write_json(self, &path_exp);
+        cli::print_experiment_written_to(path_exp.to_str().unwrap());
+
+        let mut file = utils::fs::create_file(&path_res);
         E::write_result_header(&mut file);
 
         let i = interactive;
@@ -141,13 +153,11 @@ impl Experiment {
         }
 
         exp_time.stop();
-        cli::echo(i, || {
-            cli::print_experiment_run_end(
-                &exp_time,
-                treatments.len(),
-                num_not_completed,
-                result_file.to_str().unwrap(),
-            )
-        });
+        cli::print_experiment_run_end(
+            &exp_time,
+            treatments.len(),
+            num_not_completed,
+            path_res.to_str().unwrap(),
+        );
     }
 }

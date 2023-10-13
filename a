@@ -1,0 +1,1 @@
+{"measurement":"Validation","graph_data":[{"Random":{"seed":9864,"num_nodes":1000,"density":0.25}}],"graph_representation":["AdjListStdVec"],"algorithm":[{"Dijkstra":{"PriorityQueue":"StdBinaryHeap"}}],"algorithm_data":["Cached"],"pairs":[{"seed":465477,"num_pairs":100}]}

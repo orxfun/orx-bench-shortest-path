@@ -1,12 +1,15 @@
 use colored::Colorize;
 
 pub trait Operation {
+    fn matches(command: &str) -> bool {
+        Self::name().to_lowercase() == command.to_lowercase()
+    }
     fn name() -> &'static str;
-    fn run();
+    fn run(command: &str);
     fn run_if_matches(command: &str) {
-        if Self::name().to_lowercase() == command.to_lowercase() {
+        if Self::matches(command) {
             let _oper = OperationRun::new(Self::name());
-            Self::run();
+            Self::run(command);
         }
     }
 }

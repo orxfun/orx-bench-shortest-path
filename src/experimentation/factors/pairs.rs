@@ -2,8 +2,9 @@ use super::factor::Factor;
 use crate::utils::cli;
 use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct FactorPairs {
     pub seed: u64,
     pub num_pairs: usize,

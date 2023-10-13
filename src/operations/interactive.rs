@@ -18,7 +18,7 @@ impl Operation for Interactive {
     fn name() -> &'static str {
         "interactive"
     }
-    fn run() {
+    fn run(_command: &str) {
         let experiment = Experiment::from_cli();
         cli::print_experiment(&experiment);
         match experiment.measurement {

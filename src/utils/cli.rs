@@ -283,6 +283,10 @@ pub fn print_treatments(
 }
 
 // experiment run
+pub fn print_experiment_written_to(experiment_path: &str) {
+    println!("Experiment written to:\n{}\nwhich can later be used to directly run experiment with\n'>_ cargo run --release fromfile={}'\n",
+    experiment_path.green(), experiment_path);
+}
 pub fn print_experiment_run_start() {
     let starting_message = "running experiment ...";
     println!("{}\n", starting_message.italic().dimmed());

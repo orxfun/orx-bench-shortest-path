@@ -1,10 +1,11 @@
 use super::{dimacs9th::GraphDimacs9th, random::GraphRandom};
 use crate::{experimentation::factors::factor::Factor, graph::sp_graph::SpGraph, utils::cli};
 use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum FactorGraphData {
     Random(GraphRandom),
     Dimacs9th(GraphDimacs9th),

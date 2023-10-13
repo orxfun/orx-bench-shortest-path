@@ -3,13 +3,14 @@ use crate::{
     utils::{self, cli},
     Weight,
 };
+use serde::{Deserialize, Serialize};
 use std::{io::BufRead, path::PathBuf};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 const DATA_FOLDER: &str = r"benchmark_data/dimacs_9th/";
 
-#[derive(Clone, Copy, Debug, EnumIter, Default)]
+#[derive(Clone, Copy, Debug, EnumIter, Default, Serialize, Deserialize)]
 pub enum GraphDimacs9th {
     #[default]
     USARoaddNY,

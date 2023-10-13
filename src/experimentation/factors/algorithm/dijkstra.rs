@@ -1,10 +1,11 @@
 use super::{priority_queue::PriorityQueue, priority_queue_deckey::PriorityQueueDecKey};
 use crate::utils::cli;
 use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Dijkstra {
     PriorityQueue(PriorityQueue),
     PriorityQueueDecKey(PriorityQueueDecKey),

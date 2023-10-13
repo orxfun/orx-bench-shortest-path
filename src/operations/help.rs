@@ -9,7 +9,7 @@ impl Operation for Help {
     fn name() -> &'static str {
         "help"
     }
-    fn run() {
+    fn run(_command: &str) {
         cli::print_header(None, "orx-bench-shortest-path");
         cli::print_definition_under_header("https://github.com/orxfun/orx-bench-shortest-path");
 
@@ -36,8 +36,13 @@ impl Operation for Help {
         println!("\nwhere 'c1 c2 c3 ...' is an arbitrary sequence of operations / commands.");
 
         cli::print_subheader(2, "Available Commands");
-        println!("* help        : view the help content");
-        println!("* interactive : allows to define and run an experiment interactively");
+        println!("* help        : view the help content.");
+        println!("* interactive : allows to define and run an experiment interactively.");
+        println!(
+            "* fromfile    : allows to run an experiment from a json experiment file:\n\
+            \t\texperiment definition files can be created manually;\n\
+            \t\thowever, each interactive run does also create the experiment file."
+        );
 
         cli::print_subheader(2, "Examples");
         println!("{}", ">_ cargo run --release help".green());
@@ -47,6 +52,15 @@ impl Operation for Help {
         println!(
             "{}",
             "to define and run the experimentation interactively".italic()
+        );
+        println!();
+        println!(
+            "{}",
+            r">_ cargo run --release fromfile=results\my-experiment.json".green()
+        );
+        println!(
+            "{}",
+            "to directly run the experiment defined in the given file".italic()
         );
     }
 }
