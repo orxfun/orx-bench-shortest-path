@@ -1,5 +1,5 @@
 use crate::{
-    graph::sp_graph::SpGraph,
+    graph::sp_graph_builder::SpGraphBuilder,
     utils::{self, cli},
     Weight,
 };
@@ -84,9 +84,9 @@ impl GraphDimacs9th {
             buffer
         }
 
-        let temp_dir = Self::data_folder_temp();
-        let path_zip = self.path_zip_file();
-        if !path_zip.as_path().exists() {
+        if !self.path_extracted_file().exists() {
+            let temp_dir = Self::data_folder_temp();
+            let path_zip = self.path_zip_file();
             let bytes = get_file_as_byte_vec(path_zip.to_str().unwrap());
             zip_extract::extract(std::io::Cursor::new(bytes), temp_dir.as_path(), true)
                 .expect("failed to extract the compressed data file");
@@ -97,8 +97,8 @@ impl GraphDimacs9th {
     }
 
     // graph ctor
-    pub fn create_graph<G: SpGraph>(&self) -> G {
-        let mut maybe_g: Option<G> = None;
+    pub fn create_graph_builder<B: SpGraphBuilder>(&self) -> B {
+        let mut maybe_g: Option<B> = None;
 
         let lines = self.extract_and_read_lines().expect("failed to lines");
         for line in lines.flatten() {
@@ -107,7 +107,7 @@ impl GraphDimacs9th {
                 Some(&"p") => {
                     let num_nodes: usize = parts[2].parse().expect("invalid num-nodes");
                     let num_edges: usize = parts[3].parse().expect("invalid num-edges");
-                    let mut gr = G::new(Some(num_nodes), Some(num_edges));
+                    let mut gr = B::new(Some(num_nodes), Some(num_edges));
                     for i in 0..num_nodes {
                         gr.add_node(i, None);
                     }

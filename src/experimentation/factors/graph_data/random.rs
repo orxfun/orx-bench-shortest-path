@@ -1,4 +1,4 @@
-use crate::{graph::sp_graph::SpGraph, utils::cli, Weight};
+use crate::{graph::sp_graph_builder::SpGraphBuilder, utils::cli, Weight};
 use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
 use serde::{Deserialize, Serialize};
@@ -46,7 +46,7 @@ impl GraphRandom {
     }
 
     // graph ctor
-    pub fn create_graph<G: SpGraph>(&self) -> G {
+    pub fn create_graph_builder<B: SpGraphBuilder>(&self) -> B {
         let (seed, num_nodes, density) = (self.seed, self.num_nodes, self.density);
         assert!((0.0..=1.0).contains(&density));
 
@@ -67,10 +67,10 @@ impl GraphRandom {
             .collect();
         let num_edges: usize = out_degrees.iter().sum();
 
-        let mut g = G::new(Some(num_nodes), Some(num_edges));
+        let mut builder = B::new(Some(num_nodes), Some(num_edges));
 
         for (i, out_degree) in (0..num_nodes).zip(&out_degrees) {
-            g.add_node(i, Some(*out_degree));
+            builder.add_node(i, Some(*out_degree));
         }
         for (i, out_degree) in (0..num_nodes).zip(out_degrees) {
             let heads = nodes
@@ -79,11 +79,10 @@ impl GraphRandom {
                 .take(out_degree);
             for head in heads {
                 let weight = rng.gen_range(1..2 * num_nodes) as Weight;
-                g.add_edge(i, *head, weight);
+                builder.add_edge(i, *head, weight);
             }
         }
-
-        g
+        builder
     }
 }
 impl Default for GraphRandom {

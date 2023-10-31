@@ -38,7 +38,7 @@ pub fn get_experiment_and_results_paths(name: &str, interactive: bool) -> (PathB
 
     let mut paths = experiment_and_results_filepath(name, None);
     let mut counter = 2;
-    while paths.0.exists() || paths.1.exists() {
+    while (interactive && paths.0.exists()) || paths.1.exists() {
         paths = experiment_and_results_filepath(name, Some(counter));
         counter += 1;
     }

@@ -52,9 +52,10 @@ where
         while let Some((position, cost)) = self.queue.pop() {
             if position == sink {
                 return solution.reached(cost);
-            } else if self.visited[position] {
-                continue;
             }
+            // else if self.visited[position] {
+            //     continue;
+            // }
 
             let mut out_edges = graph.out_edges(position);
             while let Some(edge) = out_edges.next_edge() {

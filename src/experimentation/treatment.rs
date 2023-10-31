@@ -21,7 +21,10 @@ use crate::{
         dary::Dary, dijkstra::Dijkstra, priority_queue::PriorityQueue,
         priority_queue_deckey::PriorityQueueDecKey,
     },
-    graph::{adjlist_petgraph::AdjListPetgraph, adjlist_std_vec::AdjListStdVec, sp_graph::SpGraph},
+    graph::{
+        adjlist_flat_vec::AdjListFlatVecBuilder, adjlist_jagged_vec::AdjListJaggedVec,
+        adjlist_petgraph::AdjListPetgraph, sp_graph::SpGraph, sp_graph_builder::SpGraphBuilder,
+    },
     Weight,
 };
 use itertools::Itertools;
@@ -111,12 +114,14 @@ impl Treatment {
         }
 
         match self.graph_representation {
-            FactorGraphRepresentation::AdjListStdVec => {
-                self.run_with_graph(self.graph_data.create_graph::<AdjListStdVec>())
-            }
-            FactorGraphRepresentation::AdjListPetgraph => {
-                self.run_with_graph(self.graph_data.create_graph::<AdjListPetgraph>())
-            }
+            FactorGraphRepresentation::AdjListJaggedVec => self
+                .run_with_graph_builder(self.graph_data.create_graph_builder::<AdjListJaggedVec>()),
+            FactorGraphRepresentation::AdjListFlatVec => self.run_with_graph_builder(
+                self.graph_data
+                    .create_graph_builder::<AdjListFlatVecBuilder>(),
+            ),
+            FactorGraphRepresentation::AdjListPetgraph => self
+                .run_with_graph_builder(self.graph_data.create_graph_builder::<AdjListPetgraph>()),
         }
     }
 
@@ -130,14 +135,19 @@ impl Treatment {
         if let FactorAlgorithm::Dijkstra(dijkstra) = &self.algorithm {
             if matches!(dijkstra, Dijkstra::Petgraph) {
                 let attempt = match self.graph_representation {
-                    FactorGraphRepresentation::AdjListStdVec => {
-                        let err = String::from("(graph, algorithm) mismatch:\npetgraph::algo::Dijkstra can only be run with petgraph::graph::Graph");
-                        RunAttempt::NotCompleted(err)
-                    }
                     FactorGraphRepresentation::AdjListPetgraph => {
-                        let graph = self.graph_data.create_graph::<AdjListPetgraph>();
+                        let graph = self.graph_data.create_graph_builder::<AdjListPetgraph>();
+
+                        #[cfg(feature = "dhat-heap")]
+                        let _profiler = dhat::Profiler::new_heap();
+
+                        let graph = graph.build();
                         let algorithm = PetgraphDijsktra::new(&graph);
                         self.run_with_graph_alg(graph, algorithm)
+                    }
+                    _ => {
+                        let err = String::from("(graph, algorithm) mismatch:\npetgraph::algo::Dijkstra can only be run with petgraph::graph::Graph");
+                        RunAttempt::NotCompleted(err)
                     }
                 };
                 return Some(attempt);
@@ -146,12 +156,17 @@ impl Treatment {
         None
     }
     // all graphs
-    fn run_with_graph<E, M, G>(&self, graph: G) -> RunAttempt<M, E>
+    fn run_with_graph_builder<E, M, G, B>(&self, graph_builder: B) -> RunAttempt<M, E>
     where
         M: Measure,
         G: SpGraph,
+        B: SpGraphBuilder<G = G>,
         E: TreatmentMeasure<M = M>,
     {
+        #[cfg(feature = "dhat-heap")]
+        let _profiler = dhat::Profiler::new_heap();
+
+        let graph = graph_builder.build();
         match &self.algorithm {
             FactorAlgorithm::Dijkstra(dijkstra) => match dijkstra {
                 Dijkstra::PriorityQueue(pq) => self.run_with_graph_pq(pq, graph),
@@ -169,7 +184,9 @@ impl Treatment {
         type OrxBinary = DaryHeap<usize, Weight, 2>;
         type OrxQuaternary = DaryHeap<usize, Weight, 4>;
         type OrxOctonary = DaryHeap<usize, Weight, 8>;
-        type OrxMapHexadecimal = DaryHeap<usize, Weight, 16>;
+        type OrxD16 = DaryHeap<usize, Weight, 16>;
+        type OrxD32 = DaryHeap<usize, Weight, 32>;
+        type OrxD64 = DaryHeap<usize, Weight, 64>;
 
         match pq {
             PriorityQueue::StdBinaryHeap => {
@@ -189,8 +206,16 @@ impl Treatment {
                     let algorithm = OrxPqDijkstra::<OrxOctonary>::new(&graph);
                     self.run_with_graph_alg(graph, algorithm)
                 }
-                Dary::Hexadecimal => {
-                    let algorithm = OrxPqDijkstra::<OrxMapHexadecimal>::new(&graph);
+                Dary::D16 => {
+                    let algorithm = OrxPqDijkstra::<OrxD16>::new(&graph);
+                    self.run_with_graph_alg(graph, algorithm)
+                }
+                Dary::D32 => {
+                    let algorithm = OrxPqDijkstra::<OrxD32>::new(&graph);
+                    self.run_with_graph_alg(graph, algorithm)
+                }
+                Dary::D64 => {
+                    let algorithm = OrxPqDijkstra::<OrxD64>::new(&graph);
                     self.run_with_graph_alg(graph, algorithm)
                 }
             },
@@ -220,7 +245,9 @@ impl Treatment {
         type OrxIdxBinary = DaryHeapOfIndices<usize, Weight, 2>;
         type OrxIdxQuaternary = DaryHeapOfIndices<usize, Weight, 4>;
         type OrxIdxOctonary = DaryHeapOfIndices<usize, Weight, 8>;
-        type OrxMapHexadecimal = DaryHeapOfIndices<usize, Weight, 16>;
+        type OrxIdxD16 = DaryHeapOfIndices<usize, Weight, 16>;
+        type OrxIdxD32 = DaryHeapOfIndices<usize, Weight, 32>;
+        type OrxIdxD64 = DaryHeapOfIndices<usize, Weight, 64>;
 
         match dary {
             Dary::Binary => {
@@ -235,8 +262,16 @@ impl Treatment {
                 let algorithm = OrxPqDecKeyDijkstra::<OrxIdxOctonary>::new(&graph);
                 self.run_with_graph_alg(graph, algorithm)
             }
-            Dary::Hexadecimal => {
-                let algorithm = OrxPqDecKeyDijkstra::<OrxMapHexadecimal>::new(&graph);
+            Dary::D16 => {
+                let algorithm = OrxPqDecKeyDijkstra::<OrxIdxD16>::new(&graph);
+                self.run_with_graph_alg(graph, algorithm)
+            }
+            Dary::D32 => {
+                let algorithm = OrxPqDecKeyDijkstra::<OrxIdxD32>::new(&graph);
+                self.run_with_graph_alg(graph, algorithm)
+            }
+            Dary::D64 => {
+                let algorithm = OrxPqDecKeyDijkstra::<OrxIdxD64>::new(&graph);
                 self.run_with_graph_alg(graph, algorithm)
             }
         }
@@ -250,7 +285,9 @@ impl Treatment {
         type OrxMapBinary = DaryHeapWithMap<usize, Weight, 2>;
         type OrxMapQuaternary = DaryHeapWithMap<usize, Weight, 4>;
         type OrxMapOctonary = DaryHeapWithMap<usize, Weight, 8>;
-        type OrxMapHexadecimal = DaryHeapWithMap<usize, Weight, 16>;
+        type OrxMapD16 = DaryHeapWithMap<usize, Weight, 16>;
+        type OrxMapD32 = DaryHeapWithMap<usize, Weight, 32>;
+        type OrxMapD64 = DaryHeapWithMap<usize, Weight, 64>;
 
         match dary {
             Dary::Binary => {
@@ -265,8 +302,16 @@ impl Treatment {
                 let algorithm = OrxPqDecKeyDijkstra::<OrxMapOctonary>::new(&graph);
                 self.run_with_graph_alg(graph, algorithm)
             }
-            Dary::Hexadecimal => {
-                let algorithm = OrxPqDecKeyDijkstra::<OrxMapHexadecimal>::new(&graph);
+            Dary::D16 => {
+                let algorithm = OrxPqDecKeyDijkstra::<OrxMapD16>::new(&graph);
+                self.run_with_graph_alg(graph, algorithm)
+            }
+            Dary::D32 => {
+                let algorithm = OrxPqDecKeyDijkstra::<OrxMapD32>::new(&graph);
+                self.run_with_graph_alg(graph, algorithm)
+            }
+            Dary::D64 => {
+                let algorithm = OrxPqDecKeyDijkstra::<OrxMapD64>::new(&graph);
                 self.run_with_graph_alg(graph, algorithm)
             }
         }
@@ -280,7 +325,6 @@ impl Treatment {
     {
         let pairs = self.pairs.create_pairs(graph.num_nodes());
         let mut exp_measure = E::default();
-
         for (source, sink) in pairs {
             let solution: Solution<M> = match self.algorithm_data {
                 FactorAlgorithmData::Cached => algorithm.run_cached(&graph, source, sink),

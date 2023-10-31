@@ -1,5 +1,7 @@
 use super::{dimacs9th::GraphDimacs9th, random::GraphRandom};
-use crate::{experimentation::factors::factor::Factor, graph::sp_graph::SpGraph, utils::cli};
+use crate::{
+    experimentation::factors::factor::Factor, graph::sp_graph_builder::SpGraphBuilder, utils::cli,
+};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
@@ -13,10 +15,10 @@ pub enum FactorGraphData {
 
 impl FactorGraphData {
     // graph ctor
-    pub fn create_graph<G: SpGraph>(&self) -> G {
+    pub fn create_graph_builder<B: SpGraphBuilder>(&self) -> B {
         match self {
-            Self::Random(x) => x.create_graph(),
-            Self::Dimacs9th(x) => x.create_graph(),
+            Self::Random(x) => x.create_graph_builder::<B>(),
+            Self::Dimacs9th(x) => x.create_graph_builder::<B>(),
         }
     }
 }

@@ -22,12 +22,12 @@ tempfile = "3.8"
 zip-extract = "0.1"
 
 petgraph = "0.6"
-orx-priority-queue = { path = "../../orx-priority-queue" }
+orx-priority-queue = "0.4"
+#orx-priority-queue = { path = "../../orx-priority-queue" }
+
 
 [profile.release]
-debug = true
+debug = 1
 
 [features]
-memory = []
-memory-dhat = []
-log-iters = []
+dhat-heap = []

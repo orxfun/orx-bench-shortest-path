@@ -1,5 +1,5 @@
 use super::out_edges::OutEdges;
-use crate::{utils::log_debug::LogDebug, Weight};
+use crate::utils::log_debug::LogDebug;
 
 pub trait SpGraph: LogDebug {
     type OutEdges<'a>: OutEdges where where Self:'a;
@@ -10,11 +10,6 @@ pub trait SpGraph: LogDebug {
     // sp
     fn num_nodes(&self) -> usize;
     fn out_edges(&self, node: usize) -> Self::OutEdges<'_>;
-
-    // build
-    fn new(nodes_capacity: Option<usize>, edges_capacity: Option<usize>) -> Self;
-    fn add_node(&mut self, node: usize, out_degree_capacity: Option<usize>);
-    fn add_edge(&mut self, tail: usize, head: usize, weight: Weight);
 
     // default impl
     fn num_edges(&self) -> usize {

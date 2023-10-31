@@ -8,7 +8,9 @@ pub enum Dary {
     Binary,
     Quaternary,
     Octonary,
-    Hexadecimal,
+    D16,
+    D32,
+    D64,
 }
 impl Dary {
     pub fn d(&self) -> usize {
@@ -16,12 +18,21 @@ impl Dary {
             Self::Binary => 2,
             Self::Quaternary => 4,
             Self::Octonary => 8,
-            Self::Hexadecimal => 16,
+            Self::D16 => 16,
+            Self::D32 => 32,
+            Self::D64 => 64,
         }
     }
     pub fn level_from_cli() -> Vec<Self> {
         let available_levels: Vec<_> = Dary::iter().collect();
-        let definitions = &["d = 2", "d = 4", "d = 8", "d = 16"];
+        let definitions = &[
+            "d = 2^1 = 2",
+            "d = 2^2 = 4",
+            "d = 2^3 = 8",
+            "d = 2^4 = 16",
+            "d = 2^5 = 32",
+            "d = 2^6 = 64",
+        ];
 
         cli::print_subheader(3, "d Values of the d-ary Heaps");
         cli::print_table_get_choices("d", &available_levels, definitions, 0)
