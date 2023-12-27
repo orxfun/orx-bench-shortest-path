@@ -2,6 +2,7 @@ pub mod measure;
 pub mod orx_pq_dijkstra;
 pub mod orx_pqdeckey_dijkstra;
 pub mod petgraph_dijkstra;
+pub mod priority_queue_priority_queue;
 pub mod run_attempt;
 pub mod sd_algorithm;
 pub mod solution;

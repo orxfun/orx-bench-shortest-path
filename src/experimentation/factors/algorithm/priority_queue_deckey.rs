@@ -8,6 +8,7 @@ use strum_macros::EnumIter;
 pub enum PriorityQueueDecKey {
     OrxDaryHeapOfIndices(Dary),
     OrxDaryHeapWithMap(Dary),
+    PriorityQueuePriorityQueue,
 }
 impl PriorityQueueDecKey {
     pub fn level_from_cli() -> Vec<Self> {
@@ -22,6 +23,9 @@ impl PriorityQueueDecKey {
                         Self::OrxDaryHeapOfIndices(dary)
                     }
                     PlainPriorityQueueDecKey::OrxDaryHeapWithMap => Self::OrxDaryHeapWithMap(dary),
+                    PlainPriorityQueueDecKey::PriorityQueuePriorityQueue => {
+                        Self::PriorityQueuePriorityQueue
+                    }
                 })
             })
             .collect()
@@ -44,6 +48,9 @@ impl PriorityQueueDecKey {
                     x.d()
                 )
             }
+            Self::PriorityQueuePriorityQueue => {
+                format!("{}\n* priority_queue::PriorityQueue", algorithm_name)
+            }
         }
     }
 }
@@ -53,6 +60,7 @@ impl PriorityQueueDecKey {
 enum PlainPriorityQueueDecKey {
     OrxDaryHeapOfIndices,
     OrxDaryHeapWithMap,
+    PriorityQueuePriorityQueue,
 }
 impl PlainPriorityQueueDecKey {
     fn level_from_cli() -> Vec<Self> {
@@ -60,8 +68,10 @@ impl PlainPriorityQueueDecKey {
         let definitions = &[
             "Basic priority queue with orx_priority_queue::DaryHeapOfIndices\n\
             * heap paired up with a positions array.",
-            "Basic priority queue with std::collections::BinaryHeapWithMap\n\
+            "Basic priority queue with orx_priority_queue::BinaryHeapWithMap\n\
             * heap paired up with a hash map.",
+            "Priority queue with priority_queue::PriorityQueue\n\
+            * heap paired up with a index map.",
         ];
 
         cli::print_subheader(2, "DecreaseKey Priority Queues");

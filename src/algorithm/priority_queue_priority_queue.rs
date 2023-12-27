@@ -8,20 +8,15 @@ use crate::{
     },
     Weight,
 };
-use orx_priority_queue::{DaryHeapOfIndices, DaryHeapWithMap, PriorityQueueDecKey};
+use priority_queue::PriorityQueue;
 
-pub struct OrxPqDecKeyDijkstra<Pq>
-where
-    Pq: PriorityQueueDecKey<usize, Weight>,
-{
-    queue: Pq,
+pub struct PriorityQueuePqDecKeyDijkstra {
+    queue: PriorityQueue<usize, Weight>,
     visited: Vec<bool>,
 }
-impl<Pq> OrxPqDecKeyDijkstra<Pq>
-where
-    Pq: PriorityQueueDecKey<usize, Weight>,
-{
-    fn new(queue: Pq) -> Self {
+
+impl PriorityQueuePqDecKeyDijkstra {
+    fn new(queue: PriorityQueue<usize, u64>) -> Self {
         Self {
             queue,
             visited: Default::default(),
@@ -53,12 +48,15 @@ where
             if position == sink {
                 return solution.reached(cost);
             }
+            // else if self.visited[position] {
+            //     continue;
+            // }
 
             let mut out_edges = graph.out_edges(position);
             while let Some(edge) = out_edges.next_edge() {
                 let (head, weight) = (edge.head(), edge.weight());
                 if !self.visited[head] {
-                    self.queue.try_decrease_key_or_push(&head, cost + weight);
+                    self.queue.push_decrease(head, cost + weight);
                 }
             }
             self.visited[position] = true;
@@ -70,25 +68,12 @@ where
 }
 
 // impl
-impl<G, const D: usize> ShortestDistanceAlgorithm<G>
-    for OrxPqDecKeyDijkstra<DaryHeapOfIndices<usize, Weight, D>>
+impl<G> ShortestDistanceAlgorithm<G> for PriorityQueuePqDecKeyDijkstra
 where
     G: SpGraph,
 {
     fn new(graph: &G) -> Self {
-        Self::new(DaryHeapOfIndices::with_index_bound(graph.num_nodes()))
-    }
-    fn run_cached<M: Measure>(&mut self, graph: &G, source: usize, sink: usize) -> Solution<M> {
-        self.run_cached_core(graph, source, sink)
-    }
-}
-impl<G, const D: usize> ShortestDistanceAlgorithm<G>
-    for OrxPqDecKeyDijkstra<DaryHeapWithMap<usize, Weight, D>>
-where
-    G: SpGraph,
-{
-    fn new(_: &G) -> Self {
-        Self::new(DaryHeapWithMap::default())
+        Self::new(PriorityQueue::with_capacity(graph.num_nodes()))
     }
     fn run_cached<M: Measure>(&mut self, graph: &G, source: usize, sink: usize) -> Solution<M> {
         self.run_cached_core(graph, source, sink)
