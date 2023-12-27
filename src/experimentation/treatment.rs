@@ -12,6 +12,7 @@ use crate::{
         orx_pq_dijkstra::OrxPqDijkstra,
         orx_pqdeckey_dijkstra::OrxPqDecKeyDijkstra,
         petgraph_dijkstra::PetgraphDijsktra,
+        priority_queue_priority_queue::PriorityQueuePqDecKeyDijkstra,
         run_attempt::RunAttempt,
         sd_algorithm::ShortestDistanceAlgorithm,
         solution::Solution,
@@ -233,6 +234,10 @@ impl Treatment {
             }
             PriorityQueueDecKey::OrxDaryHeapWithMap(dary) => {
                 self.run_with_graph_pqdk_map(dary, graph)
+            }
+            PriorityQueueDecKey::PriorityQueuePriorityQueue => {
+                let algorithm = PriorityQueuePqDecKeyDijkstra::new(&graph);
+                self.run_with_graph_alg(graph, algorithm)
             }
         }
     }

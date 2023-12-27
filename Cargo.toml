@@ -22,7 +22,8 @@ tempfile = "3.8"
 zip-extract = "0.1"
 
 petgraph = "0.6"
-orx-priority-queue = "0.4"
+orx-priority-queue = "1.1"
+priority-queue = "1.3"
 #orx-priority-queue = { path = "../../orx-priority-queue" }
 
 
