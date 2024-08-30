@@ -4,6 +4,7 @@ use crate::graph::{
 };
 
 pub trait LogDebug {
+    #[allow(dead_code)]
     fn debug_log(&self);
 }
 
