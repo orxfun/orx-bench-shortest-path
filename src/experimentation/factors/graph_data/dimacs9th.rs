@@ -77,6 +77,7 @@ impl GraphDimacs9th {
         fn get_file_as_byte_vec(filename: &str) -> Vec<u8> {
             use std::io::Read;
 
+            dbg!(filename);
             let mut f = std::fs::File::open(filename).expect("no file found");
             let metadata = std::fs::metadata(filename).expect("unable to read metadata");
             let mut buffer = vec![0; metadata.len() as usize];
@@ -101,7 +102,7 @@ impl GraphDimacs9th {
         let mut maybe_g: Option<B> = None;
 
         let lines = self.extract_and_read_lines().expect("failed to lines");
-        for line in lines.flatten() {
+        for line in lines.map_while(Result::ok) {
             let parts: Vec<_> = line.split(' ').collect();
             match parts.first() {
                 Some(&"p") => {
