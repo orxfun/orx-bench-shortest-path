@@ -5,6 +5,15 @@ A command line tool to enable benchmarking shortest path algorithms on different
 * create full factorial experiments using `interactive` mode,
 * experiments can be executed directly from the interactive mode or from the created experiment file using `fromfile` mode.
 
+## Contribution
+
+If you wish to add a different
+* graph representation,
+* queue type, or
+* algorithm implementation
+
+to the experimentation tool, please open an [issue](https://github.com/orxfun/orx-bench-shortest-path/issues/new) or create a PR.
+
 
 ## A. Usage
 
